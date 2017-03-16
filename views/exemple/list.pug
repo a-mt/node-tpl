@@ -1,0 +1,21 @@
+extends ../layout
+
+block content
+
+    div(class="container")
+        if success
+          p(class="alert success") #{success}
+        if error
+          p(class="alert error") #{error}
+
+        a(href="/exemple/new" class="pull-right") Add a new exemple
+        h2(class="page-header") Exemples
+        
+        if docs.length > 0
+            div(class="list-group")
+                for item in docs
+                    div(class="list-group-item")
+                        a(href="/exemple/edit/"+item.id) #{item.name}
+                        p #{item.description}
+        else
+            p There is no exemple yet

@@ -1,0 +1,25 @@
+extends ../layout
+
+block content
+
+    div(class="container")
+        h2(class="page-header") Add an exemple
+        form(method="post")
+            div(class="form-group")
+                label(for="name") Name
+                input(type="text" name="name" id="name" class="form-control" required value=(data.name ? data.name : ''))
+                if errors.name
+                    p(class="error") #{errors.name.message}
+
+            div(class="form-group")
+                label(for="description") Description
+                textarea(name="description" id="description" class="form-control" required)
+                    if data.description
+                        | #{data.description}
+                if errors.description
+                    p(class="error") #{errors.description.message}
+
+            input(type="submit" class="btn btn-default")
+
+        br
+        a(href="/exemple") Back to the list

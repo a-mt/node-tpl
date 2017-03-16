@@ -2,9 +2,16 @@
 
 Template to start a NodeJS Project.
 
-* `express` server
-* `pug` templating
-* `bootstrap twitter` css
+* 1.0.0
+  * `express` server
+  * `pug` templating
+  * `bootstrap twitter` css
+
+* 2.0.0
+  * `dotenv` loader of environment variables 
+  * `body-parser` post variables handler
+  * `express-session` + `connect-flash` flash messages
+  * `mongoose` database
 
 ## Install
 
@@ -14,8 +21,10 @@ Template to start a NodeJS Project.
       cd node-tpl
       rm -drf .git
 
-    Optional :  
-    Move the content of `node-tpl` to the parent directory
+    __To clone an older tag__, use the name of tag instead of `master`.  
+    Ex : `git clone --depth=1 --branch=1.0.0 git://github.com/a-mt/node-tpl`
+
+    __Optional__ : Move the content of `node-tpl` to the parent directory
 
       cd ..
       mv node-tpl/{.*,*} .
@@ -29,3 +38,6 @@ Template to start a NodeJS Project.
 
     * Change details of `package.json`
     * Change details of `README.md`
+    * Create a file `.env` containing the required environment variables
+
+          MONGO_URI="mongodb://user:password@host/dbname"
