@@ -1,7 +1,10 @@
 var basicHandler   = require(process.cwd() + '/app/controllers/basic.js'),
     exempleHandler = require(process.cwd() + '/app/controllers/exemple.js');
 
-module.exports = function (app) {
+module.exports = function(app) {
+
+    // login / logout
+    require('./auth')(app);
 
     // homepage
     app.get('/', basicHandler.index);
