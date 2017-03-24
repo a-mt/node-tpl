@@ -28,6 +28,13 @@ module.exports = function (passport) {
 
 	    require('./passport-github')(passport);
 	}
+	// Login via Twitter
+	if(hasModule('passport-twitter')) {
+	    process.env['AUTH_TWITTER'] = 1;
+	    c++;
+
+	    require('./passport-twitter')(passport);
+	}
 	
 	if(!c) {
 	    process.env['AUTH_NONE'] = 1;

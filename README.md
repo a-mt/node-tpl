@@ -15,13 +15,14 @@ Template to start a NodeJS Project.
   * `express-session` + `connect-flash` flash messages
   * `mongoose` database
 
-* 3.0.0  
+* master  
   Handle authentication
   * `connect-mongo` persist sessions to database
   * `bcrypt` hash password
   * `passport` authentication middleware + (remove the ones you don't need from package.json) :
     * `passport-local` to support local auth
     * `passport-github` to login via github
+    * `passport-twitter` to login via twitter
 
 ## Install
 
@@ -66,4 +67,20 @@ Template to start a NodeJS Project.
 
             GITHUB_KEY="Client ID"
             GITHUB_SECRET="Client Secret"
+            APP_URL="http://url/"
+
+    * For Twitter auth :
+      - [Create an application](https://apps.twitter.com/)
+
+        | Field                      | Value                              |
+        |---                         |---                                 |
+        | Name                       | `Name displayed to the user`       |
+        | Description                | `Description`                      |
+        | Homepage URL               | `http://url/`                      |
+        | Authorization callback URL | `http://url/auth/twitter/callback` |
+
+      - Add environment variables to `.env`
+
+            TWITTER_KEY="Consumer Key"
+            TWITTER_SECRET="Consumer Secret"
             APP_URL="http://url/"

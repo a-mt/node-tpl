@@ -5,11 +5,11 @@ module.exports = function(app) {
 
     // pages that require an authenticated user redirect to /login
     function isLoggedIn(req, res, next) {
-		if (req.isAuthenticated()) {
-			return next();
-		} else {
-			res.redirect('/login');
-		}
+        if (req.isAuthenticated()) {
+            return next();
+        } else {
+            res.redirect('/login');
+        }
     }
 
     // signup
@@ -19,7 +19,7 @@ module.exports = function(app) {
 
     // login
     app.route('/login')
-		.get(authHandler.signin)
+        .get(authHandler.signin)
         .post(passport.authenticate('local', {
             successRedirect: '/',
             failureRedirect: '/login',
@@ -27,9 +27,9 @@ module.exports = function(app) {
         }));
 
     // logout
-	app.get('/logout', function (req, res) {
-		req.logout();
-		res.redirect('/');
+    app.get('/logout', function (req, res) {
+        req.logout();
+        res.redirect('/');
     });
 
     // change password
@@ -39,12 +39,26 @@ module.exports = function(app) {
 
     // login via github (if module `passport-github` installed)
     if(process.env.AUTH_GITHUB) {
-    	app.route('/auth/github')
-    	   .get(passport.authenticate('github'));
-    
+        app.route('/auth/github')
+           .get(passport.authenticate('github'));
+
         app.route('/auth/github/callback')
            .get(passport.authenticate('github', {
-    			    successRedirect: '/',
+                successRedirect: '/',
+                    failureRedirect: '/login',
+                    failureFlash: true
+                }
+            ));
+    }
+
+    // login via twitter (if module `passport-twitter` installed)
+    if(process.env.AUTH_TWITTER) {
+        app.route('/auth/twitter')
+           .get(passport.authenticate('twitter'));
+
+        app.route('/auth/twitter/callback')
+           .get(passport.authenticate('twitter', {
+                successRedirect: '/',
                     failureRedirect: '/login',
                     failureFlash: true
                 }
