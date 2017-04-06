@@ -2,22 +2,11 @@
 
 Template to start a NodeJS Project.
 
-* 1.0.0  
-  Simple Express server
-  * `express` server
-  * `pug` templating
-  * `bootstrap twitter` css
-
-* 2.0.0  
-  Handle forms
-  * `dotenv` loader of environment variables 
-  * `body-parser` post variables handler
-  * `express-session` + `connect-flash` flash messages
-  * `mongoose` database
-
-* master  
+* sequelize  
   Handle authentication
-  * `connect-mongo` persist sessions to database
+  * `mysql` database
+  * `sequelize` + `sequelize-transforms` ORM
+  * `connect-session-sequelize` persist sessions to database
   * `bcrypt` hash password
   * `passport` authentication middleware + (remove the ones you don't need from package.json) :
     * `passport-local` to support local auth
@@ -28,12 +17,7 @@ Template to start a NodeJS Project.
 
 * Clone the repo
 
-      git clone --depth=1 --branch=master git://github.com/a-mt/node-tpl
-      cd node-tpl
-      rm -drf .git
-
-    __To clone a specific tag__ that is not the last one, use the name of tag instead of `master`.  
-    Ex : `git clone --depth=1 --branch=1.0.0 git://github.com/a-mt/node-tpl`
+      git clone --depth=1 --branch=sequelize git://github.com/a-mt/node-tpl && cd node-tpl && rm -drf .git
 
     __Optional__ : Move the content of `node-tpl` to the parent directory
 
@@ -51,7 +35,7 @@ Template to start a NodeJS Project.
     * Change details of `README.md`
     * Create a file `.env` containing the required environment variables
 
-          MONGO_URI="mongodb://user:password@host/dbname"
+          MYSQL_URI="mysql://user:password@host/dbname"
 
     * For Github auth :  
       - [Create an application](https://github.com/settings/applications/new)

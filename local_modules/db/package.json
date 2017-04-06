@@ -1,0 +1,10 @@
+{
+  "name": "db",
+  "version": "1.0.0",
+  "description": "Get the instance of sequelize",
+  "author": "a-mt",
+  "license": "ISC",
+  "dependencies": {
+    "sequelize": "^3.30.4"
+  }
+}

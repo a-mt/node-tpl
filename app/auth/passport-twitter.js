@@ -14,38 +14,41 @@ module.exports = function (passport) {
         throw new Error('The environment variable APP_URL isn\'t set');
     }
 
-	passport.use(new TwitterStrategy(
-	    {
-    		consumerKey    : process.env.TWITTER_KEY,
-    		consumerSecret : process.env.TWITTER_SECRET,
-    		callbackURL    : process.env.APP_URL + 'auth/twitter/callback'
-    	},
-    	function (token, refreshToken, profile, done) {
-    	  process.nextTick(function () { // Fire User.findOne when we have all our data back
+    passport.use(new TwitterStrategy(
+        {
+            consumerKey    : process.env.TWITTER_KEY,
+            consumerSecret : process.env.TWITTER_SECRET,
+            callbackURL    : process.env.APP_URL + 'auth/twitter/callback'
+        },
+        function (token, refreshToken, profile, done) {
+          process.nextTick(function () { // Fire User.findOne when we have all our data back
 
-			User.findOne({ 'twitter_id': profile.id }, function (err, user) {
-				if (err) {
-				    return done(err);
-				}
+            User.findOne({ where: {
+                'ref_id'  : profile.id,
+                'provider': 'twitter'
+            } }).then(function(user) {
 
                 //If the user is found then log them in
-				if (user) {
-					return done(null, user);
+                if (user) {
+                    return done(null, user);
 
                 // If not, create it
-				} else {
-				    user = new User({
-				        username   : profile.username,
-				        twitter_id : profile.id
-					});
-					user.save(function (err) {
-						if (err) throw err;
-						return done(null, user);
-					});
-				}
-			});
+                } else {
+                    user = User.build({
+                        username : profile.username,
+                        ref_id   : profile.id
+                    });
+                    user.save().then(function() {
+                        return done(null, user);
+                    }).catch(function(err){
+                        return done(err);
+                    });
+                }
+            }).catch(function(err) {
+                done(err);
+            });
 
-    	  });
-    	}
+          });
+        }
     ));
 };

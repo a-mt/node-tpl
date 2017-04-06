@@ -1,19 +1,28 @@
 'use strict';
 
-var mongoose = require('mongoose'),
-    Schema   = mongoose.Schema;
+var sequelize = require('db'),
+    ORM       = sequelize.ORM,
+    needSync  = !sequelize.models.user;
 
-var GithubUser = new Schema({
-    provider: { type: String, default: 'github' },
+var GithubUser = sequelize.define('user', {
+    provider: { type: ORM.STRING, defaultValue: 'github' },
     username: {
-        type: String,
+        type: ORM.STRING,
         trim: true,
-        required: [true, 'The field "username" is required']
+        defaultValue: '',
+        validate: {
+            notEmpty:  { msg: 'The field "username" is required' }
+        }
     },
-    github_id: {
-        type: String,
-        required: [true, 'The field "id" is required']
+    ref_id: {
+        type: ORM.STRING,
+        defaultValue: '',
+        validate: {
+            notEmpty:  { msg: 'The field "id" is required' }
+        }
     }
-}, { collection: 'users' });
-
-module.exports = mongoose.model('GithubUser', GithubUser);
+});
+if(needSync) {
+    GithubUser.sync(); // create the table if it doesn't exist
+}
+module.exports = GithubUser;

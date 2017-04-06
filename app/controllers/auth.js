@@ -1,5 +1,6 @@
 'use strict';
-var User = require('../models/user/local');
+var User      = require('../models/user/local'),
+    sequelize = require('db');
 
 function AuthHandler(){
 
@@ -13,31 +14,24 @@ function AuthHandler(){
     };
     this.addUser = function(req, res) {
         var params = req.body;
-        var user   = new User(params);
+        var user   = User.build(params);
 
         // Save user
-        user.save(function(err){
+        user.save().catch(function(err){
 
             // Data validation of model failed
-           if(err) {
-               var errors = err.errors || {};
+           var errors = sequelize.formatErr(err);
 
-               // Err duplicate
-                if (err.name === 'MongoError' && err.code === 11000) {
-                    errors.username = {
-                        message: 'User already exists'
-                    };
-                }
-                // Render form with errors
-                req.flash('errors', errors);
-                req.flash('data', req.body);
+            // Render form with errors
+            req.flash('errors', errors);
+            req.flash('data', req.body);
 
-                res.redirect('/signup');
-            } else {
-                req.login(user, function () {
-                    res.redirect('/');
-                });
-            }
+            res.redirect('/signup');
+
+        }).then(function(){
+            req.login(user, function () {
+                res.redirect('/');
+            });
         });
     };
 
@@ -60,33 +54,32 @@ function AuthHandler(){
         var user = req.user;
 
         // Check if given password matches current
-        user.verifyPassword(req.body.password, function(err, isMatch){
-
-            // Render form with errors
-            if(!isMatch) {
-                req.flash('errors', {
-                    password: {message: 'Incorrect password.'}
-                });
-                req.flash('data', req.body);
-                res.redirect('/settings');
-                return;
-            }
+        user.verifyPassword(req.body.password).then(function(){
 
             // Save changes
             user.password = req.body.newpassword;
-            user.save(function(err){
+            user.save().catch(function(err){
 
                 // Data validation failed ?
-                if(err) {
-                    req.flash('errors', {
-                        newpassword: err.errors.password
-                    });
-                    req.flash('data', req.body);
-                } else {
-                    req.flash('success', 'Your password has been successfully updated');
-                }
+                var errors = sequelize.formatErr(err);
+                req.flash('errors', {
+                    newpassword: errors.password
+                });
+                req.flash('data', req.body);
+                res.redirect('/settings');
+
+            }).then(function(){
+                req.flash('success', 'Your password has been successfully updated');
                 res.redirect('/settings');
             });
+        }).catch(function(){
+
+            // Render form with errors
+            req.flash('errors', {
+                password: {message: 'Incorrect password.'}
+            });
+            req.flash('data', req.body);
+            res.redirect('/settings');
         });
     };
 }

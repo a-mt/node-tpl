@@ -1,32 +1,14 @@
 'use strict';
 
-var mongoose = require('mongoose'),
-    Schema   = mongoose.Schema,
-    bcrypt   = require('bcrypt');
+var sequelize = require('db'),
+    ORM       = sequelize.ORM,
+    bcrypt    = require('bcrypt');
 
+// Password hashing
 var SALT_WORK_FACTOR = 10;
 
-var LocalUser = new Schema({
-    provider: { type: String, default: 'local' },
-    username: {
-        type: String,
-        trim: true,
-        lowercase: true,
-        unique: true,
-        required: [true, 'The field "username" is required']
-    },
-    password: {
-        type: String,
-        trim: true,
-        minlength: [3, 'The password must be at least 3 characters long'],
-        required: [true, 'The field "password" is required']
-    }
-}, { collection: 'users' });
-
-// Hash the password
-LocalUser.pre('save', function(next) {
-    var user = this;
-    if (!user.isModified('password')) {
+var hashPassword = function(user, options, next) {
+    if (!user._changed.password) {
         return next();
     }
 
@@ -39,17 +21,56 @@ LocalUser.pre('save', function(next) {
             if (err) return next(err);
 
             user.password = hash;
-            next();
+            next(null, user);
         });
     });
-});
-
-// Check password match
-LocalUser.methods.verifyPassword = function(password, cb) {
-  bcrypt.compare(password, this.password, function(err, isMatch) {
-    if (err) return cb(err);
-    cb(null, isMatch);
-  });
 };
 
-module.exports = mongoose.model('LocalUser', LocalUser);
+var LocalUser = sequelize.define('user', {
+    provider: { type: ORM.STRING, defaultValue: 'local' },
+    username: {
+        type: ORM.STRING,
+        trim: true,
+        lowercase: true,
+        unique: true,
+        defaultValue: '',
+        validate: {
+            notEmpty:  { msg: 'The field "username" is required' }
+        }
+    },
+    password: {
+        type: ORM.STRING,
+        trim: true,
+        defaultValue: '',
+        validate: {
+            notEmpty:  { msg: 'The field "description" is required' },
+            len: { args: 3, msg: 'The password must be at least 3 characters long' }
+        }
+    },
+    ref_id: {
+        type: ORM.STRING,
+        defaultValue: ''
+    }
+}, {
+    hooks: {
+        beforeCreate: hashPassword,
+        beforeUpdate: hashPassword
+    },
+    instanceMethods: {
+
+        // Check password match
+        verifyPassword: function(password) {
+            var shouldBe = this.password;
+            return new Promise(function(resolve, reject) {
+                bcrypt.compare(password, shouldBe, function(err, isMatch) {
+                    if (err) return reject(err);
+                    if (!isMatch) return reject(new Error('Passwords do not match'));
+                    resolve();
+                });
+            });
+        }
+    }
+});
+LocalUser.sync(); // create the table if it doesn't exist
+
+module.exports = LocalUser;

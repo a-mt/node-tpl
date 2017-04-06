@@ -1,36 +1,30 @@
+require('dotenv').load(); // load .env variables
+
 var express    = require('express'),
     app        = express(),
     routes     = require('./app/routes/index.js');
 
 //---------------------------------------------------------
 
-require('dotenv').load(); // load .env variables
-
-// Connect DB
-var mongoose = require('mongoose');
-mongoose.connect(process.env.MONGO_URI);
-mongoose.Promise = global.Promise;
-
 // Auth
 var passport = require('passport');
 require('./app/auth/passport')(passport);
 
-var session    = require('express-session'),
-    MongoStore = require('connect-mongo')(session);
+var session   = require('express-session'),
+    SqlStore  = require('connect-session-sequelize')(session.Store),
+    store     = new SqlStore({
+        db                     : require('db'),
+        checkExpirationInterval: 30 * 60 * 1000, // cleanup expired sessions every 30 min
+        expiration             : 24 * 60 * 60 * 1000  // duration of a valid session 24 h
+    });
+store.sync();
 
 app.use(session({
     secret: 'ce0c04361d',
-    resave: true,
-    saveUninitialized: true,
+    resave: false,
+    saveUninitialized: false,
     cookie: {maxAge: 24 * 60 * 60 * 1000}, // 1 day
-
-    // Save session in database (so it doesn't get lost when server stops)
-    store: new MongoStore({
-        mongooseConnection: mongoose.connection,
-        autoRemove: 'interval',
-        autoRemoveInterval: 30, // check expired sessions every 30 min
-        touchAfter: 12 * 3600
-    })
+    store: store
 }));
 
 app.use(passport.initialize());

@@ -1,19 +1,27 @@
 'use strict';
 
-var mongoose = require('mongoose'),
-    Schema   = mongoose.Schema;
+var sequelize = require('db'),
+    ORM       = sequelize.ORM;
 
-var Exemple = new Schema({
+// http://docs.sequelizejs.com/en/2.0/docs/models-definition/
+var Exemple = sequelize.define('exemple', {
     name: {
-        type: String,
+        type: ORM.STRING,
         trim: true,
         unique: true,
-        required: [true, 'The field "name" is required']
+        defaultValue: '',
+        validate: {
+            notEmpty:  { msg: 'The field "name" is required' }
+        }
     },
     description: {
-        type: String,
-        required: [true, 'The field "description" is required']
+        type: ORM.STRING,
+        defaultValue: '',
+        validate: {
+            notEmpty:  { msg: 'The field "description" is required' }
+        }
     }
 });
+Exemple.sync(); // create the table if it doesn't exist
 
-module.exports = mongoose.model('Exemple', Exemple);
+module.exports = Exemple;
