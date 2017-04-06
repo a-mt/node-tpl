@@ -24,6 +24,9 @@ Template to start a NodeJS Project.
     * `passport-github` to login via github
     * `passport-twitter` to login via twitter
 
+* sequelize  
+  Same as master but using a Mysql database
+
 ## Install
 
 * Clone the repo
